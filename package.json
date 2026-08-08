@@ -1,0 +1,25 @@
+{
+  "name": "websockets-demo",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevonKalar/websockets-demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DevonKalar/websockets-demo/issues"
+  },
+  "homepage": "https://github.com/DevonKalar/websockets-demo#readme",
+  "dependencies": {
+    "ws": "^8.21.3"
+  }
+}
