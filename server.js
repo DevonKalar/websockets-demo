@@ -2,6 +2,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { WebSocketServer } from 'ws';
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), 'public');
@@ -29,6 +30,18 @@ const server = http.createServer((req, res) => {
     });
     res.end(data);
   });
+});
+
+const wss = new WebSocketServer({ server });
+
+wss.on('connection', (socket) => {
+  console.log('client connected');
+
+  socket.on('message', (raw) => {
+    socket.send(`echo: ${raw}`);
+  });
+
+  socket.on('close', () => console.log('client disconnected'));
 });
 
 server.listen(PORT, () => console.log(`http://localhost:${PORT}`));
