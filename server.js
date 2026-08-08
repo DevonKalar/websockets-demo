@@ -34,11 +34,32 @@ const server = http.createServer((req, res) => {
 
 const wss = new WebSocketServer({ server });
 
+function broadcast(payload) {
+  console.log('attempting to broadcast');
+  const data = JSON.stringify(payload);
+  console.log(`received: ${data}`)
+  for (const client of wss.clients) {
+    if (client.readyState === client.OPEN) client.send(data);
+  }
+}
+
 wss.on('connection', (socket) => {
   console.log('client connected');
 
   socket.on('message', (raw) => {
-    socket.send(`echo: ${raw}`);
+    console.log('recived event... emitting now...')
+    let msg;
+    try {
+      msg = JSON.parse(raw);
+    } catch {
+      return; //ignore malformed
+    }
+    if (msg.type !== 'chat' || typeof msg.text !== 'string') return;
+
+    const text = msg.text.trim().slice(0, 500);
+    if (!text) return;
+
+    broadcast({ type: 'chat', text, at: Date.now() });
   });
 
   socket.on('close', () => console.log('client disconnected'));
