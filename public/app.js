@@ -26,6 +26,8 @@ socket.addEventListener('message', (event) => {
   if (msg.type === 'chat') {
     const time = new Date(msg.at).toLocaleTimeString();
     addLine(`[${time}] ${msg.text}`);
+  } else if (msg.type === 'presence') {
+    setStatus('online', `connected - ${msg.count} online`);
   }
 });
 

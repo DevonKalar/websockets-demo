@@ -35,19 +35,16 @@ const server = http.createServer((req, res) => {
 const wss = new WebSocketServer({ server });
 
 function broadcast(payload) {
-  console.log('attempting to broadcast');
   const data = JSON.stringify(payload);
-  console.log(`received: ${data}`)
   for (const client of wss.clients) {
     if (client.readyState === client.OPEN) client.send(data);
   }
 }
 
 wss.on('connection', (socket) => {
-  console.log('client connected');
+  broadcast({ type: 'presence', count: wss.clients.size });
 
   socket.on('message', (raw) => {
-    console.log('recived event... emitting now...')
     let msg;
     try {
       msg = JSON.parse(raw);
@@ -62,7 +59,9 @@ wss.on('connection', (socket) => {
     broadcast({ type: 'chat', text, at: Date.now() });
   });
 
-  socket.on('close', () => console.log('client disconnected'));
+  socket.on('close', () => {
+    broadcast({ type: 'presence', count: wss.clients.size })
+  });
 });
 
 server.listen(PORT, () => console.log(`http://localhost:${PORT}`));
