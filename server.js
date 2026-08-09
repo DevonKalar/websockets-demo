@@ -42,6 +42,9 @@ function broadcast(payload) {
 }
 
 wss.on('connection', (socket) => {
+  socket.isAlive = true;
+  socket.on('pong', () => { socket.isAlive = true; });
+
   broadcast({ type: 'presence', count: wss.clients.size });
 
   socket.on('message', (raw) => {
@@ -63,5 +66,18 @@ wss.on('connection', (socket) => {
     broadcast({ type: 'presence', count: wss.clients.size })
   });
 });
+
+const heartbeat = setInterval(() => {
+  for (const socket of wss.clients) {
+    if (!socket.isAlive) {
+      socket.terminate();
+      continue
+    }
+    socket.isAlive = false;
+    socket.ping();
+  }
+}, 30000);
+
+wss.on('close', () => clearInterval(heartbeat));
 
 server.listen(PORT, () => console.log(`http://localhost:${PORT}`));
